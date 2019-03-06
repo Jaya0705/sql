@@ -1,0 +1,190 @@
+create table dept(dep_id varchar(3) primary key,depname varchar(20),depmanager varchar(20)); 
+ 
+ 
+insert into dept values("D01","HEALTH","TIM ARCHER"); 
+insert into dept values("D02","COMMUNICATIONS","ADAM JUSTIN"); 
+insert into dept values("D03","PRODUCT","BRUCE WILLS"); 
+insert into dept values("D04","INSURANCE","ROBERT SWIFT"); 
+insert into dept values("D05","FINANCE","NATASHA STEVENS"); 
+
+create table employee(e_id varchar(5) ,name varchar(20),dep_id varchar(5) references dept(dep_id),salary number,managerid varchar(5)); 
+
+ 
+insert into employee values("A114","MARTIN TREDEAU","D01",54497,"A120"); 
+insert into employee values("A116","ROBIN WAYNE","D02",20196,"A187"); 
+insert into employee values("A178","BRUCE WILLS","D03",66861,"A298"); 
+insert into employee values("A132","PAUL VINCENT","D01",94791,"A120"); 
+insert into employee values("A198","TOM HANKS","D02",16879,"A187"); 
+insert into employee values("A120","TIM ARCHER","D01",48834,"A298"); 
+insert into employee values("A143","BRAD MICHAEL","D01",24488,"A120"); 
+insert into employee values("A187","ADAM JUSTIN","D02",80543,"A298"); 
+insert into employee values("A121","STUART WILLIAM","D02",78629,"A187"); 
+insert into employee values("A187","ROBERT SWIFT","D04",27700,"A298"); 
+insert into employee values("A176","EDWARD CANE","D01",89176,"A120"); 
+insert into employee values("A142","TARA CUMMINGS","D04",99475,"A187"); 
+insert into employee values("A130","VANESSA PARY","D04",28565,"A187"); 
+insert into employee values("A128","ADAM WAYNE","D05",94324,"A165"); 
+insert into employee values("A129","JOSEPH ANGELIN","D05",44280,"A165"); 
+insert into employee values("A165","NATASHA STEVENS","D05",31377,"A298"); 
+insert into employee values("A111","JOHN HELLEN","D01",15380,"A120"); 
+insert into employee values("A194","HAROLLD STEVENS","D02",32166,"A187"); 
+insert into employee values("A133","STEVE MICHELOS","D02",61215,"A187"); 
+insert into employee values("A156","NICK MARTIN","D03",50174,"A178"); 
+ 
+
+1) select employees with top 3 salaries
+select name from employee order by salary desc limit 3;
++---------------+
+| name          |
++---------------+
+| TARA CUMMINGS |
+| PAUL VINCENT  |
+| ADAM WAYNE    |
++---------------+
+
+2)Select the Employee with the least salary
+select name from employee order by salary limit 1;
+JOHN HELLEN
+
+3)Select the Employee who does not have a manager in the department table
+select name from employee where managerid not in ( select e_id from employee);
+-----------------+
+| name            |
++-----------------+
+| TIM ARCHER      |
+| ADAM JUSTIN     |
+| ROBERT SWIFT    |
+| NATASHA STEVENS |
+| BRUCE WILLS     |
++-----------------+
+
+4)Select the Employee who is also a Manager 
+select distinct e.name,e1.managerid from employee e join employee e1 on e.e_id=e1.managerid;                              
++-----------------+
+| name            |
++-----------------+
+| TIM ARCHER      |
+| ADAM JUSTIN     |
+| ROBERT SWIFT    |
+| NATASHA STEVENS |
+| BRUCE WILLS     |
++-----------------+
+   
+   
+5)Select the Empolyee who is a Manager and has least salary  
+select distinct e.name,e1.managerid from employee e join employee e1 on e.e_id=e1.managerid order by e.salary limit 1; 
+ROBERT SWIFT|A187
+ 
+6)Select the total number of Employees in Communications departments 
+select count(*) from employee e join dept d on e.dep_id=d.dep_id where d.depname='COMMUNICATIONS'; 
+6
+ 
+
+7)Select the Employee in Finance Department who has the top salary 
+select e.name from employee e join dept d on e.dep_id=d.dep_id where d.depname='FINANCE' order by e.salary desc limit 1; 
+ADAM WAYNE
+ 
+8)Select the Employee in product depatment who has the least salary 
+select e.name from employee e join dept d on e.dep_id=d.dep_id where d.depname='PRODUCT' order by e.salary limit 1; 
+NICK MARTIN 
+ 
+
+9)Select the count of Empolyees in Health with maximum salary 
+select count(e.e_id),e.salary from employee e join dept d on e.dep_id=d.dep_id where d.depname='HEALTH' group by e.salary order by e.salary desc limit 1; 
+1|94791
+
+ 
+10)Select the Employees who report to Natasha Stevens 
+select name from employee where managerid in(select e_id from employee where name='NATASHA STEVENS'); 
+ADAM WAYNE 
+JOSEPH ANGELIN 
+
+11)Display the Employee name,Employee count,Dep name,Dept manager in the Health department
+SELECT e.name,count(e.e_id),d.depname,d.depmanager from employee e join dept d on e.dep_id=d.dep_id where d.depname="HEALTH";
++----------------+---------------+---------+------------+
+| name           | count(e.e_id) | depname | depmanager |
++----------------+---------------+---------+------------+
+| MARTIN TREDEAU |             6 | HEALTH  | TIM ARCHER |
++----------------+---------------+---------+------------+
+1 row in set (0.00 sec)
+
+
+12)Display the Department id,Employee ids and Manager ids for the Communications department
+select d.dep_id,e.e_id,e.managerid from employee e join dept d on e.dep_id=d.dep_id where d.depname='COMMUNICATIONS';
+
++--------+------+-----------+
+| dep_id | e_id | managerid |
++--------+------+-----------+
+| D02    | A116 | A187      |
+| D02    | A198 | A187      |
+| D02    | A187 | A298      |
+| D02    | A121 | A187      |
+| D02    | A194 | A187      |
+| D02    | A133 | A187      |
++--------+------+-----------+
+
+
+13)Select the Average Expenses for Each dept with Dept id and Dept name
+select avg(e.salary),d.dep_id,d.depname from employee e join dept d on e.dep_id=d.dep_id group by d.dep_id,d.depname;
+---------------+--------+----------------+
+| avg(e.salary) | dep_id | depname        |
++---------------+--------+----------------+
+|    54527.6667 | D01    | HEALTH         |
+|    48271.3333 | D02    | COMMUNICATIONS |
+|    58517.5000 | D03    | PRODUCT        |
+|    51913.3333 | D04    | INSURANCE      |
+|    56660.3333 | D05    | FINANCE        |
++---------------+--------+----------------+
+
+14)Select the total expense for the department finance
+select sum(e.salary) from employee e join dept d on e.dep_id=d.dep_id where depname='FINANCE';
+
+169981
+
+15)Select the department which spends the least with Dept id and Dept manager name
+select d.dep_id,sum(e.salary)as t,d.depname,d.depmanager from dept d join employee e on d.dep_id=e.dep_id group by e.dep_id order by t limit 1;
+
++--------+--------+---------+-------------+
+| dep_id | t      | depname | depmanager  |
++--------+--------+---------+-------------+
+| D03    | 117035 | PRODUCT | BRUCE WILLS |
++--------+--------+---------+-------------+
+
+16)Select the count of Employees in each department
+select count(e.e_id), d.dep_id,d.depname from employee e join dept d on e.dep_id=d.dep_id group by d.dep_id ;
++---------------+--------+----------------+
+| count(e.e_id) | dep_id | depname        |
++---------------+--------+----------------+
+|             6 | D01    | HEALTH         |
+|             6 | D02    | COMMUNICATIONS |
+|             2 | D03    | PRODUCT        |
+|             3 | D04    | INSURANCE      |
+|             3 | D05    | FINANCE        |
++---------------+--------+----------------+
+
+17)Select the count of Employees in each department having salary <10000
+select dep_id,count(e_id) from employee where salary<10000 group by dep_id;
+ 
+EMPTY SET
+
+
+18)Select the total number of Employees in Dept id D04
+select count(e_id) from employee where dep_id='D04';
+ 
+ 3
+ 
+ 
+19)Select all department details of the Department with Maximum Employees
+select d.dep_id,d.depname,d.depmanager,count(e.e_id) from dept d  join employee e on d.dep_id=e.dep_id  group by d.dep_id order by count(e.e_id) desc limit 2;
++--------+----------------+-------------+---------------+
+| dep_id | depname        | depmanager  | count(e.e_id) |
++--------+----------------+-------------+---------------+
+| D01    | HEALTH         | TIM ARCHER  |             6 |
+| D02    | COMMUNICATIONS | ADAM JUSTIN |             6 |
++--------+----------------+-------------+---------------+
+
+
+20)Select the Employees who has Tim Cook as their manager
+select e.name from employee e join dept d on e.dep_id=d.dep_id where d.depmanager='TIM COOK';
+
+EMPTY SET
