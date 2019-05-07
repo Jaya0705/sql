@@ -1,6 +1,6 @@
 create table dept(dep_id varchar(3) primary key,depname varchar(20),depmanager varchar(20)); 
  
- 
+ AAAAAAAAAAAA
 insert into dept values("D01","HEALTH","TIM ARCHER"); 
 insert into dept values("D02","COMMUNICATIONS","ADAM JUSTIN"); 
 insert into dept values("D03","PRODUCT","BRUCE WILLS"); 
